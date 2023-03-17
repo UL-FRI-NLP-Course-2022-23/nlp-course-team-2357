@@ -2,7 +2,6 @@
 
 Team members:
  * Mitja Vendramin, 63170301, mv2825@student.uni-lj.si
- * `MEMBER FULL NAME`, `STUDENT ID`, `STUDENT E-MAIL`
  * Luka Boljević, 63210482, lb7093@student.uni-lj.si
  * Matjaž Bizjak, 63170054, mb0539@student.uni-lj.si
  
