@@ -1,7 +1,7 @@
 # Natural language processing course 2022/23: Paraphrasing sentences
 
 Team members:
- * `MEMBER FULL NAME`, `STUDENT ID`, `STUDENT E-MAIL`
+ * Mitja Vendramin, 63170301, mv2825@student.uni-lj.si
  * `MEMBER FULL NAME`, `STUDENT ID`, `STUDENT E-MAIL`
  * Luka Boljević, 63210482, lb7093@student.uni-lj.si
  
