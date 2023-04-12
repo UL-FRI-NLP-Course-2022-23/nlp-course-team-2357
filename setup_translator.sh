@@ -1,8 +1,9 @@
 #!/bin/bash
 
 #docker run -it --rm nvcr.io/nvidia/pytorch:22.08-py3 bash
+sudo apt-get install zstd -y
 
-if [ ! -d = "Slovene_NMT" ];
+if [ ! -d "Slovene_NMT" ];
 then
     docker pull nvcr.io/nvidia/pytorch:22.08-py3
 
@@ -12,6 +13,8 @@ then
     cp docker-compose.yml Slovene_NMT/docker-compose.yml
 
     cd Slovene_NMT
+    mkdir models
+    cd models
 
     curl --remote-name-all https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1736{/slen_GEN_nemo-1.2.6.tar.zst,/ensl_GEN_nemo-1.2.6.tar.zst}
 
@@ -23,6 +26,7 @@ then
 
     rm *.zst *.tar
 
+    cd ..
     if [ "$1" = "gpu" ];
     then
         docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
