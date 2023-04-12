@@ -1,0 +1,26 @@
+services:
+  translator_ensl:
+    restart: unless-stopped
+    image: rsdo/ds4/nemo-nmt:latest
+    build: .
+    container_name: translator_ensl
+    ports:
+      - 4001:4000
+    volumes:
+      - type: bind
+        source: ./models/v1.2.6/ensl
+        target: /opt/nmt/models/v1.2.6
+        read_only: true
+
+  translator_slen:
+    restart: unless-stopped
+    image: rsdo/ds4/nemo-nmt:latest
+    build: .
+    container_name: translator_slen
+    ports:
+      - 4002:4000
+    volumes:
+      - type: bind
+        source: ./models/v1.2.6/slen
+        target: /opt/nmt/models/v1.2.6
+        read_only: true

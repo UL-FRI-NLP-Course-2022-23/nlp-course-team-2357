@@ -1,0 +1,15 @@
+services:
+  translator_ensl:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities:
+              - gpu
+  translator_slen:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities:
+              - gpu
