@@ -8,10 +8,19 @@ Team members:
 Group public acronym/name: nlp-course-team-2357
 
 
+# Dataset
+
+The [ccKres dataset](https://www.clarin.si/repository/xmlui/handle/11356/1034) used for this project can be downloaded simply by running the `download_dataset.py` script. Read more about ccKres and open Slovene corpora in general on [this link](http://eng.slovenscina.eu/korpusi/proste-zbirke).
+
+The dataset will be extracted inside the folder `cckres`, with the following structure:
+- `cckres/text` contains files with raw, unprocessed text of the corpus.
+- `cckres/xml` contains the corresponding `xml` files, which split the raw text into paragraphs, sentences, and words. The lemma and [Slovene MSD](http://nl.ijs.si/jos/josMSD-en.html) (Morpho-Syntactic Descriptor) of each word is known.
+- `cckres/vert` contains a single file, `cckres.vert`, a vertical file containing *all* text from the corpus, split into paragraphs, sentences, and words, with lemmas, Slovene and English MSDs known for each word.
+
 
 # Docker
 
-Make sure that before you start anything, Docker is installed on your machine. If it is, you can freely skip this section. We also suggest a 16GB RAM machine, as the Docker containers we will create later can take up as much as ~12GB of RAM at peak memory usage.
+To set up the translation service, Docker needs to be installed on your machine. If it is, you can freely skip this section. We also suggest a 16GB RAM machine, as the Docker containers we will create later can take up as much as ~12GB of RAM at peak memory usage.
  
 On Windows, the easiest way to install Docker is to download [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/). Simply download the installer, and run it to install. 
 
@@ -27,20 +36,115 @@ To avoid having to run docker as sudo all the time, follow the short instruction
 
 # Slovene NMT
 
-To set up [Slovene NMT](https://github.com/clarinsi/Slovene_NMT) (Neural Machine Translator), simply run the script `./setup_translator.sh` with the argument `cpu`, if you want to deploy on CPU, or `gpu` if you want to deploy on (NVIDIA) GPU. The script will do the following:
+To set up [Slovene NMT](https://github.com/clarinsi/Slovene_NMT) (Neural Machine Translator), simply run one of the available scripts:
+- `./setup_translator_linux.sh`, if you are using Linux
+- `./setup_translator_gitbash.sh`, if you are on Windows and prefer using [Git Bash](https://git-scm.com/downloads)
+- `& .\setup_translator_powershell.ps1`, if you are using Windows and prefer using PowerShell. In this case, you need to run PowerShell as **Administrator** for the script to work.
+
+All scripts accept arguments `cpu` and `gpu`. Run the script applicable to you, with the argument `cpu`, if you want to deploy on CPU, or `gpu` if you want to deploy on (NVIDIA) GPU. All scripts will do the following:
 - Install the `zstd` program, required to decompress pretrained NVIDIA NeMo translation models, compressed as `.tar.zst` files.
 - Pull the image `nvcr.io/nvidia/pytorch:22.08-py3` from Dockerhub. This is done prior to building the containers with docker compose, as there might be some authorization errors otherwise.
+- Clone and prepare the `Slovene_NMT` repository
 - Download the NeMo translation models from the very bottom of [this page](https://www.clarin.si/repository/xmlui/handle/11356/1736).
 - After decompressing and unzipping the models, build and run the containers for translation.
 
-Running the script for the first time takes a while, so simply let it run until completion. Notice that currently, the script can only be run on Linux. A Windows script will be added in the future. 
+Running the script for the first time takes a while, so simply let it run until completion. Also note that inside the scripts, there is a line intended for deleting the downloaded (`.tar.zst`) and extracted (`.tar`) NVIDIA model archives. Inside the two Windows scripts, there are two lines that remove the downloaded `zstd` program. All of those lines are currently commented, but feel free to uncomment them.
 
-For now, setting up Slovene NMT on Windows needs to be done "manually". To make it as painless as possible, we will first list what you are required to download and/or install, before getting into the actual set up. You can perform the same steps on Linux of course.
+Setting up `Slovene_NMT` can also be done "manually". The steps are included at the bottom of this README, for completeness sake.
 
+
+## Example usage
+
+After running one of the setup scripts, or going through the manual steps to set everything up, the translation service can now be accessed via `localhost`. English to Slovene translation will be available on port 4001, while Slovene to English translation will be available on port 4002.
+
+## Health Check
+
+To do a health check of the English to Slovene container, you can:
+- Go to `localhost:4001/api/healthCheck`, or
+- From the terminal (we recommend Git Bash on Windows), run `curl -X GET localhost:4001/api/healthCheck`. 
+    
+The output should be something like:
+```json
+{
+    "status": 0,
+    "start_time": "2023-04-11T19:05:27.927677+00:00",
+    "models": [
+        {
+            "tag": "ensl:GEN:nemo-1.2.6",
+            "workers": {
+                "platform": "gpu",
+                "active": 0
+            },
+            "features": null,
+            "info": null
+        }
+    ],
+    "num_requests_processed": 0
+}
+```
+
+To do the same for Slovene to English container, just replace port 4001 with port 4002.
+
+## Translation
+
+To perform English to Slovene translation, create the following example `ensl.json` file:
+```json
+{
+    "src_language": "en",
+    "tgt_language": "sl",
+    "text": "Today was a sunny day. Hopefully, it will be sunny tomorrow as well."
+}
+```
+
+Then, from the terminal (we recommend Git Bash on Windows), run:
+```bash
+curl -X POST -H "Content-Type: application/json" -d @ensl.json http://localhost:4001/api/translate
+```
+
+Translation should take a few seconds, and the result should be:
+```json
+{
+    "result": "Danes je bil sončen dan in upam, da bo tudi jutri sončno."
+}
+```
+
+---
+
+To do Slovene to English translation, create the following example `slen.json` file:
+```json
+{
+    "src_language": "sl",
+    "tgt_language": "en",
+    "text": "Danes prijetno sneži. Jutri bo pa še lepše."
+}
+```
+
+Then, from the terminal, run:
+```bash
+curl -X POST -H "Content-Type: application/json" -d @slen.json http://localhost:4002/api/translate
+```
+
+The returned result should be:
+```json
+{
+    "result": "It snows well today, and tomorrow it will be even better."
+}
+```
+
+## Stopping the containers
+
+When you are done with translations, stop the containers with `docker stop translator_ensl` and `docker stop translator_slen`.
+
+
+
+---
+
+
+# Manual setup of Slovene NMT
 
 ## Prerequisites
 
-We will now list what you need to download and/or install, before getting into the actual set up of Slovene NMT.
+To make setting up Slovene NMT as painless as possible, we will first list what you are required to download and/or install, before getting into the actual set up.
 
 - Open a terminal, and run the command:
     ```bash
@@ -51,24 +155,24 @@ We will now list what you need to download and/or install, before getting into t
 - Slovene NMT needs pretrained NVIDIA NeMo models for the translation. The two models can be downloaded from the very bottom of [this page](https://www.clarin.si/repository/xmlui/handle/11356/1736).
 
 - The two NMT models are compressed as `.tar.zst` files. You will need the `zstd` program to decompress them.
-   - On Windows, download the latest release of `zstd` from [this link](https://github.com/facebook/zstd/releases), which at the time of writing is v1.5.5. In other words, `zstd-v1.5.5-win64.zip` needs to be downloaded. After downloading, extract the zip file to wherever you want.
+   - On Windows, download the latest release of `zstd` from [this link](https://github.com/facebook/zstd/releases), which at the time of writing is v1.5.5. In other words, `zstd-v1.5.5-win64.zip` needs to be downloaded. After downloading, extract the zip archive to the location of your choosing.
    - If you are on Linux, install `zstd` with `sudo apt-get install zstd -y`.
 
 
-## Setting up Slovene NMT
+## Setting it up
 
-After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo model files, and installing `zstd`, you are equipped to set up Slovene NMT.
+After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo model files, and installing `zstd`, you are equipped to set up `Slovene_NMT`.
 
-1. In the folder where this repository is cloned, clone the Slovene NMT repository:
+1. In the folder where this repository is cloned, clone the `Slovene_NMT` repository:
     ```bash
     git clone https://github.com/clarinsi/Slovene_NMT.git
     ```
     Move inside of folder `Slovene_NMT`.
 
-2. Inside Slovene_NMT, create a folder called `models`. Move the two downloaded NeMo model files, namely `slen_GEN_nemo-1.2.6.tar.zst` and `ensl_GEN_nemo-1.2.6.tar.zst`, inside that folder.
+2. Inside `Slovene_NMT`, create a folder called `models`. Move the two downloaded NeMo model files, namely `slen_GEN_nemo-1.2.6.tar.zst` and `ensl_GEN_nemo-1.2.6.tar.zst`, inside that folder.
 
 3. Decompress the `.tar.zst` files using the `zstd` program you downloaded:
-   - On Windows, run the following two commands:
+   - On Windows, run the following two commands (notice that you need to supply the relative path to `zstd.exe`):
     ```powershell
     path/to/zstd.exe -d slen_GEN_nemo-1.2.6.tar.zst
     ```
@@ -86,7 +190,6 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
     Running the commands should result in two archives, `slen_GEN_nemo-1.2.6.tar` and `ensl_GEN_nemo-1.2.6.tar`.
 
 4. Newly created `.tar` archives need to be unzipped.
-    - On Windows, you can use WinRAR to unzip the archives. Right click on the archives, and click "Extract Here".
     - On Linux, you can also right click on the archives, and click "Extract Here". If you prefer using the terminal, you can use the `tar -xf` command:
     ```bash
     tar -xf slen_GEN_nemo-1.2.6.tar
@@ -94,6 +197,7 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
     ```bash
     tar -xf ensl_GEN_nemo-1.2.6.tar
     ```
+    - On Windows, you can use WinRAR to unzip the archives. Right click on the archives, and click "Extract Here". You can also use the same `tar -xf` command, both in Git Bash *and* PowerShell.
     
     Unzipping the archives results in two new folders inside `models/v1.2.6`: `ensl` and `slen`. Each of these folders contains a `model.info` file and an `aayn_base.nemo` file, which together form the pretrained models for translating English to Slovene and Slovene to English, respectively.
 
@@ -171,86 +275,3 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
     INFO:     Application startup complete.
     INFO:     Uvicorn running on http://0.0.0.0:4000 (Press CTRL+C to quit)
     ```
-
-
-## Example usage
-
-The translation service can now be accessed via `localhost`. Based on the new docker compose file we used, English to Slovene translation will be available on port 4001, while Slovene to English translation will be available on port 4002.
-
-### Health Check
-
-To do a health check of the English to Slovene container, you can:
-- Go to `localhost:4001/api/healthCheck`, or
-- From the terminal (we recommend Git Bash on Windows), run `curl -X GET localhost:4001/api/healthCheck`. 
-    
-The output should be something like:
-```json
-{
-    "status": 0,
-    "start_time": "2023-04-11T19:05:27.927677+00:00",
-    "models": [
-        {
-            "tag": "ensl:GEN:nemo-1.2.6",
-            "workers": {
-                "platform": "gpu",
-                "active": 0
-            },
-            "features": null,
-            "info": null
-        }
-    ],
-    "num_requests_processed": 0
-}
-```
-
-To do the same for Slovene to English container, just replace port 4001 with port 4002.
-
-### Translation
-
-To perform English to Slovene translation, create the following example `ensl.json` file:
-```json
-{
-    "src_language": "en",
-    "tgt_language": "sl",
-    "text": "Today was a sunny day. Hopefully, it will be sunny tomorrow as well."
-}
-```
-
-Then, from the terminal (we recommend Git Bash on Windows), run:
-```bash
-curl -X POST -H "Content-Type: application/json" -d @ensl.json http://localhost:4001/api/translate
-```
-
-Translation should take a few seconds, and the result should be:
-```json
-{
-    "result": "Danes je bil sončen dan in upam, da bo tudi jutri sončno."
-}
-```
-
----
-
-To do Slovene to English translation, create the following example `slen.json` file:
-```json
-{
-    "src_language": "sl",
-    "tgt_language": "en",
-    "text": "Danes prijetno sneži. Jutri bo pa še lepše."
-}
-```
-
-Then, from the terminal, run:
-```bash
-curl -X POST -H "Content-Type: application/json" -d @slen.json http://localhost:4002/api/translate
-```
-
-The returned result should be:
-```json
-{
-    "result": "It snows well today, and tomorrow it will be even better."
-}
-```
-
-### Stopping the containers
-
-When you are done with translations, stop the containers with `docker stop translator_ensl` and `docker stop translator_slen`.
