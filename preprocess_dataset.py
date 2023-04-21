@@ -1,5 +1,4 @@
 import os
-import urllib.request as req
 import nltk
 import re
 
@@ -22,7 +21,9 @@ def main():
                 contents = f.read()
                 contents = re.sub('[\n]+', '\n', contents)
                 contents = contents.strip()
-                tokens = nltk.sent_tokenize(contents)
+                contents = contents.replace('«', '"')
+                contents = contents.replace('»', '"')
+                tokens = nltk.sent_tokenize(contents, language='slovene')
                 for t in tokens:
                     if t[0].isupper() and (t[len(t)-1] == '.' or t[len(t)-1] == '?' or t[len(t)-1] == '!'):
                         outcontent.append(re.sub('\n', ' ', t))
