@@ -17,7 +17,7 @@ def main():
         outcontent = []
         # checking if it is a file
         if os.path.isfile(f):
-            with open(f) as f:
+            with open(f, encoding='utf-8') as f:
                 contents = f.read()
                 contents = re.sub('[\n]+', '\n', contents)
                 contents = contents.strip()
@@ -29,13 +29,13 @@ def main():
                         outcontent.append(re.sub('\n', ' ', t))
         
         if len(outcontent) != 0:
-            with open(outfile, 'a') as f:
+            with open(outfile, 'a', encoding='utf-8') as f:
                 for t in outcontent:
                     f.write(t+"\n")
         
         i += 1
-        if i == 10:
-            break
+        #if i == 100:
+        #    break
 
 
 if __name__ == "__main__":

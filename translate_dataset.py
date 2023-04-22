@@ -25,7 +25,7 @@ def main():
         outcontent = []
         # checking if it is a file
         if os.path.isfile(f):
-            with open(f) as f:
+            with open(f, encoding='utf-8') as f:
                 contents = f.read()
                 lines = nltk.sent_tokenize(contents)
                 i = 0
@@ -46,13 +46,14 @@ def main():
                         r = requests.post("http://localhost:4002/api/translate", json={ "src_language": "sl",
                                                                                         "tgt_language": "en",
                                                                                         "text": tokens })
+                    print("test")
                     print(r)
                     if r.status_code == 200:
                         temp = r.json()["result"]
                         for t in temp:
                             outcontent.append(t)
         if len(outcontent) != 0:
-            with open(outfile, 'a') as f:
+            with open(outfile, 'a', encoding='utf-8') as f:
                 for t in outcontent:
                     f.write(t+"\n")
 
