@@ -1,3 +1,4 @@
+@@ -0,0 +1,61 @@
 import requests
 import os
 import sys
@@ -46,7 +47,6 @@ def main():
                         r = requests.post("http://localhost:4002/api/translate", json={ "src_language": "sl",
                                                                                         "tgt_language": "en",
                                                                                         "text": tokens })
-                    print("test")
                     print(r)
                     if r.status_code == 200:
                         temp = r.json()["result"]
