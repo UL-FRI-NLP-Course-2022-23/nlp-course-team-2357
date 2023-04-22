@@ -1,4 +1,4 @@
-if ($args[0] -ne "gpu" -or $args[0] -ne "cpu"){
+if ($args[0] -ne "gpu" -and $args[0] -ne "cpu"){
     Write-Host "Please specify either 'gpu' (to deploy on GPU) or 'cpu' (to deploy on CPU) as the first argument."
     exit
 }
@@ -16,6 +16,7 @@ if (-not (Test-Path "Slovene_NMT")){
 
 Copy-Item -Path docker-compose.gpu.yml -Destination Slovene_NMT/docker-compose.gpu.yml
 Copy-Item -Path docker-compose.yml -Destination Slovene_NMT/docker-compose.yml
+Copy-Item -Path Dockerfile -Destination Slovene_NMT/Dockerfile
 
 Set-Location Slovene_NMT
 if (-not (Test-Path "models")){
@@ -24,20 +25,22 @@ if (-not (Test-Path "models")){
 Set-Location models
 
 # NVIDIA models
-# $TLS12Protocol = [System.Net.SecurityProtocolType] 'Ssl3 , Tls12'
-# [System.Net.ServicePointManager]::SecurityProtocol = $TLS12Protocol
-if (-not (Test-Path "slen.tar.zst")){
-    Invoke-WebRequest -Uri https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1736/slen_GEN_nemo-1.2.6.tar.zst -OutFile slen.tar.zst -Verbose
+if (-not (Test-Path "slen_GEN_nemo-1.2.6.tar.zst")){
+    Invoke-WebRequest -Uri https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1736/slen_GEN_nemo-1.2.6.tar.zst -OutFile slen_GEN_nemo-1.2.6.tar.zst
 }
-if (-not (Test-Path "ensl.tar.zst")){
-    Invoke-WebRequest -Uri https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1736/ensl_GEN_nemo-1.2.6.tar.zst -OutFile ensl.tar.zst -Verbose
+if (-not (Test-Path "ensl_GEN_nemo-1.2.6.tar.zst")){
+    Invoke-WebRequest -Uri https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1736/ensl_GEN_nemo-1.2.6.tar.zst -OutFile ensl_GEN_nemo-1.2.6.tar.zst
 }
 
 # Extract all archives
-../../zstd/zstd-v1.5.5-win64/zstd.exe -d slen.tar.zst -f
-../../zstd/zstd-v1.5.5-win64/zstd.exe -d ensl.tar.zst -f
-tar -xf slen.tar
-tar -xf ensl.tar
+Write-Host "Extracting slen_GEN_nemo-1.2.6.tar.zst ..."
+../../zstd/zstd-v1.5.5-win64/zstd.exe -d slen_GEN_nemo-1.2.6.tar.zst -f
+Write-Host "Extracting ensl_GEN_nemo-1.2.6.tar.zst ..."
+../../zstd/zstd-v1.5.5-win64/zstd.exe -d ensl_GEN_nemo-1.2.6.tar.zst -f
+Write-Host "Extracting slen_GEN_nemo-1.2.6.tar ..."
+tar -xf slen_GEN_nemo-1.2.6.tar
+Write-Host "Extracting ensl_GEN_nemo-1.2.6.tar ..."
+tar -xf ensl_GEN_nemo-1.2.6.tar
 
 # Feel free to uncomment these lines if you want to remove the archives and zstd
 # Remove-Item *.zst *.tar

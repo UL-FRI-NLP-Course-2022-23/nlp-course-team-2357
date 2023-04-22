@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" != "gpu" ] || [ "$1" != "cpu" ];
+if [ "$1" != "gpu" ] && [ "$1" != "cpu" ];
 then
     echo "Please specify either 'gpu' (to deploy on GPU) or 'cpu' (to deploy on CPU) as the first argument."
     exit
@@ -18,6 +18,7 @@ fi
 
 cp docker-compose.gpu.yml Slovene_NMT/docker-compose.gpu.yml
 cp docker-compose.yml Slovene_NMT/docker-compose.yml
+cp Dockerfile Slovene_NMT/Dockerfile
 
 cd Slovene_NMT
 mkdir models -p
@@ -34,9 +35,13 @@ then
 fi
 
 # Extract all archives
-zstd -d slen_GEN_nemo-1.2.6.tar.zst
-zstd -d ensl_GEN_nemo-1.2.6.tar.zst
+echo "Extracting slen_GEN_nemo-1.2.6.tar.zst ..."
+zstd -d slen_GEN_nemo-1.2.6.tar.zst -f
+echo "Extracting ensl_GEN_nemo-1.2.6.tar.zst ..."
+zstd -d ensl_GEN_nemo-1.2.6.tar.zst -f
+echo "Extracting slen_GEN_nemo-1.2.6.tar ..."
 tar -xf slen_GEN_nemo-1.2.6.tar
+echo "Extracting ensl_GEN_nemo-1.2.6.tar ..."
 tar -xf ensl_GEN_nemo-1.2.6.tar
 
 # Feel free to uncomment this line if you want to remove the archives
@@ -46,7 +51,8 @@ cd ..
 if [ "$1" = "gpu" ];
 then
     docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
-elif [ "$1" = "cpu" ];
+fi
+if [ "$1" = "cpu" ];
 then
     docker compose up -d
 fi
