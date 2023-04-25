@@ -1,4 +1,4 @@
-# Natural language processing course 2022/23: Paraphrasing sentences
+# Natural language processing course 2022/23: Paraphrasing sentences <!-- omit in toc -->
 
 Team members:
  * Mitja Vendramin, 63170301, mv2825@student.uni-lj.si
@@ -6,6 +6,18 @@ Team members:
  * Matjaž Bizjak, 63170054, mb0539@student.uni-lj.si
  
 Group public acronym/name: nlp-course-team-2357
+
+
+
+# Table of contents <!-- omit in toc -->
+
+- [Dataset](#dataset)
+- [Docker](#docker)
+- [Slovene NMT](#slovene-nmt)
+- [Manual setup of Slovene NMT](#manual-setup-of-slovene-nmt)
+  - [Prerequisites](#prerequisites)
+  - [Setting it up](#setting-it-up)
+
 
 
 # Dataset
@@ -20,8 +32,8 @@ The dataset will be extracted inside the folder `cckres`, with the following str
 
 # Docker
 
-To set up the translation service, Docker needs to be installed on your machine. If it is, you can freely skip this section. We also suggest a 16GB RAM machine, as the Docker containers we will create later can take up as much as ~12GB of RAM at peak memory usage.
- 
+To set up the translation service, Docker needs to be installed on your machine. If it is, you can freely skip this section. 
+
 On Windows, the easiest way to install Docker is to download [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/). Simply download the installer, and run it to install. 
 
 Docker Desktop requires WSL (Windows Subsystem for Linux) version 2 to run properly. If you do not have WSL on your Windows machine, it can be installed by simply going opening PowerShell in **administrator** mode, and executing `wsl --install`, as specified [here](https://learn.microsoft.com/en-us/windows/wsl/install#install-wsl-command). You do not actually need to do anything else with WSL, you just need to have it installed.
@@ -36,10 +48,10 @@ To avoid having to run docker as sudo all the time, follow the short instruction
 
 # Slovene NMT
 
-To set up [Slovene NMT](https://github.com/clarinsi/Slovene_NMT) (Neural Machine Translator), simply run one of the available scripts:
-- `./setup_translator_linux.sh`, if you are using Linux
-- `./setup_translator_gitbash.sh`, if you are on Windows and prefer using [Git Bash](https://git-scm.com/downloads)
-- `& .\setup_translator_powershell.ps1`, if you are using Windows and prefer using PowerShell. In this case, you need to run PowerShell as **Administrator** for the script to work.
+To set up [Slovene_NMT](https://github.com/clarinsi/Slovene_NMT) (Neural Machine Translator), simply run one of the available scripts:
+- `./setup_translator_linux.sh`, if you are using Linux,
+- `./setup_translator_gitbash.sh`, if you are on Windows and prefer using [Git Bash](https://git-scm.com/downloads),
+- `& .\setup_translator_powershell.ps1`, if you are on Windows and prefer using PowerShell. In this case, you need to run PowerShell as **Administrator** for the script to work. Please keep in mind that downloading the NVIDIA models via PowerShell is rather slow. If you want, you can manually download and place the NVIDIA models in the appropriate directory inside `Slovene_NMT`, and comment out unnecessary commands in the script.
 
 All scripts accept arguments `cpu` and `gpu`. Run the script applicable to you, with the argument `cpu`, if you want to deploy on CPU, or `gpu` if you want to deploy on (NVIDIA) GPU. All scripts will do the following:
 - Install the `zstd` program, required to decompress pretrained NVIDIA NeMo translation models, compressed as `.tar.zst` files.
@@ -50,94 +62,19 @@ All scripts accept arguments `cpu` and `gpu`. Run the script applicable to you, 
 
 Running the script for the first time takes a while, so simply let it run until completion. Also note that inside the scripts, there is a line intended for deleting the downloaded (`.tar.zst`) and extracted (`.tar`) NVIDIA model archives. Inside the two Windows scripts, there are two lines that remove the downloaded `zstd` program. All of those lines are currently commented, but feel free to uncomment them.
 
-Setting up `Slovene_NMT` can also be done "manually". The steps are included at the bottom of this README, for completeness sake.
+You may notice that the docker compose files the scripts will copy into `Slovene_NMT` split the translation service into two containers - one for English to Slovene, and one for Slovene to English translation. This is different to original docker compose files from `Slovene_NMT`, where the deployment places both translation services in one container, but we deemed this unnecessary.
 
+Note that the API of the two containers will not be available until the model is loaded inside the container, which can take about 6 to 7 minutes. It is best to stream the logs with `docker logs -f translator_slen` i.e. `docker logs -f translator_ensl` and see exactly when the initialization finishes. After it finishes, the API will be available on `localhost` ports 4001 (English to Slovene translation) and 4002 (Slovene to English translation). Check the file [`SloveneNMT_example_usage.md`](SloveneNMT_example_usage.md) for details how to use the API.
 
-## Example usage
+**Important note**: on Windows, the two Docker containers that will be created, coupled with the VM Docker Desktop uses in the background, can in total easily take up 12-13GB of RAM just to be able to run. If you have more than 16GB of RAM, you should be okay, but if you don't, we **strongly** suggest running one container at a time.
 
-After running one of the setup scripts, or going through the manual steps to set everything up, the translation service can now be accessed via `localhost`. English to Slovene translation will be available on port 4001, while Slovene to English translation will be available on port 4002.
-
-## Health Check
-
-To do a health check of the English to Slovene container, you can:
-- Go to `localhost:4001/api/healthCheck`, or
-- From the terminal (we recommend Git Bash on Windows), run `curl -X GET localhost:4001/api/healthCheck`. 
-    
-The output should be something like:
-```json
-{
-    "status": 0,
-    "start_time": "2023-04-11T19:05:27.927677+00:00",
-    "models": [
-        {
-            "tag": "ensl:GEN:nemo-1.2.6",
-            "workers": {
-                "platform": "gpu",
-                "active": 0
-            },
-            "features": null,
-            "info": null
-        }
-    ],
-    "num_requests_processed": 0
-}
-```
-
-To do the same for Slovene to English container, just replace port 4001 with port 4002.
-
-## Translation
-
-To perform English to Slovene translation, create the following example `ensl.json` file:
-```json
-{
-    "src_language": "en",
-    "tgt_language": "sl",
-    "text": "Today was a sunny day. Hopefully, it will be sunny tomorrow as well."
-}
-```
-
-Then, from the terminal (we recommend Git Bash on Windows), run:
-```bash
-curl -X POST -H "Content-Type: application/json" -d @ensl.json http://localhost:4001/api/translate
-```
-
-Translation should take a few seconds, and the result should be:
-```json
-{
-    "result": "Danes je bil sončen dan in upam, da bo tudi jutri sončno."
-}
-```
-
----
-
-To do Slovene to English translation, create the following example `slen.json` file:
-```json
-{
-    "src_language": "sl",
-    "tgt_language": "en",
-    "text": "Danes prijetno sneži. Jutri bo pa še lepše."
-}
-```
-
-Then, from the terminal, run:
-```bash
-curl -X POST -H "Content-Type: application/json" -d @slen.json http://localhost:4002/api/translate
-```
-
-The returned result should be:
-```json
-{
-    "result": "It snows well today, and tomorrow it will be even better."
-}
-```
-
-## Stopping the containers
-
-When you are done with translations, stop the containers with `docker stop translator_ensl` and `docker stop translator_slen`.
+Setting up `Slovene_NMT` can also be done "manually". The steps are included at the bottom of this README, in section [Manual setup of Slovene NMT](#manual-setup-of-slovene-nmt), for completeness sake.
 
 
 
 ---
+---
+
 
 
 # Manual setup of Slovene NMT
@@ -201,9 +138,34 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
     
     Unzipping the archives results in two new folders inside `models/v1.2.6`: `ensl` and `slen`. Each of these folders contains a `model.info` file and an `aayn_base.nemo` file, which together form the pretrained models for translating English to Slovene and Slovene to English, respectively.
 
-5. You can now safely delete, or at the very least move the two `.tar.zst` and two `.tar` archives from `models`, as they are not needed anymore.
+5. You can now safely delete, or at the very least move the two `.tar.zst` and two `.tar` archives from `models`, as they are not needed anymore, but you don't have to.
 
-6. In the root of `Slovene_NMT`, edit the existing `docker-compose.yml` file to have the following contents:
+6. In the root of `Slovene_NMT`, edit the existing `Dockerfile` to have the following contents:
+    ```docker
+    FROM nvcr.io/nvidia/pytorch:22.08-py3 as nemo
+
+    ARG DEBIAN_FRONTEND=noninteractive
+
+    RUN apt-get update \
+        && apt-get upgrade -y \
+        && git clone https://github.com/NVIDIA/NeMo.git /workspace/nemo \
+        && cd /workspace/nemo \
+        && git checkout v1.11.0 \
+        && ./reinstall.sh
+
+    FROM nemo as service
+
+    ARG DEBIAN_FRONTEND=noninteractive
+
+    COPY . /opt/nmt
+    RUN python3 -m pip install -r /opt/nmt/requirements.txt
+    WORKDIR /opt/nmt
+
+    ENTRYPOINT [ "python3", "server.py" ]
+    ```
+    The difference between this `Dockerfile` and the original one is in one line - `&& python3 -m pip install --upgrade pip \`. We removed this line because deployment will fail if pip is upgraded.
+
+7. In the root of `Slovene_NMT`, edit the existing `docker-compose.yml` file to have the following contents:
     ```yaml
     services:
       translator_ensl:
@@ -232,7 +194,7 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
             target: /opt/nmt/models/v1.2.6
             read_only: true
     ```
-    When we run `docker compose up` later, this should create two containers - one for English to Slovene translation, and another for Slovene to English translation. Loading both models inside of one container is not necessary, and actually not even possible on a system with an 8GB GPU, due to very large memory requirements.
+    When we run `docker compose up` later, this should create two containers - one for English to Slovene translation, and another for Slovene to English translation. Loading both models inside of one container is simply not necessary. Another reason for this was that GPU deployment, on our team's best GPU (RTX 3070 with 8GB VRAM), was actually impossible, due to very large memory requirements.
     
     If you are going to be deploying on an NVIDIA GPU, also edit the existing `docker-compose.gpu.yml` file to contain the following:
     ```yaml
@@ -253,7 +215,7 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
                   - gpu
     ```
 
-7. Finally, you can deploy the translator:
+8. Finally, you can deploy the translator:
     -  To deploy on CPU, run
     ```bash
     docker compose up -d
@@ -265,7 +227,7 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
 
     Deploying will take a bit of time, even having prepulled the required `nvcr.io/nvidia/pytorch:22.08-py3` image, so be patient.
     
-8. After the two containers have been created and started, the models need to be loaded inside the container before the API is available. You can check the status by streaming the logs of the container via `docker logs -f translator_slen` and `docker logs -f translator_ensl`. If everything was set up correctly, the final few lines of the logs of eg. `translator_ensl` should be something similar to the following:
+9. After the two containers have been created and started, the models need to be loaded inside the container before the API is available. You can check the status by streaming the logs of the container via `docker logs -f translator_slen` and `docker logs -f translator_ensl`. If everything was set up correctly, the final few lines of the logs of eg. `translator_ensl` should be something similar to the following:
     ```console
     [NeMo I 2023-04-11 19:05:19 save_restore_connector:243] Model MTEncDecModel was successfully restored from /opt/nmt/models/v1.2.6/aayn_base.nemo.
     [NeMo I 2023-04-11 19:05:21 server:284] Loaded models [('ensl:GEN:nemo-1.2.6', 'gpu')]
