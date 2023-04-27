@@ -19,12 +19,14 @@ def main():
         if os.path.isfile(f):
             with open(f, encoding='utf-8') as f:
                 contents = f.read()
-                contents = re.sub('[\n]+', '\n', contents)
-                contents = contents.strip()
+                #contents = re.sub('[\n]+', '\n', contents)
+                #contents = contents.strip()
                 contents = contents.replace('«', '"')
                 contents = contents.replace('»', '"')
                 tokens = nltk.sent_tokenize(contents, language='slovene')
                 for t in tokens:
+                    if len(t.split(" ")) < 4:
+                        continue
                     if t[0].isupper() and (t[len(t)-1] == '.' or t[len(t)-1] == '?' or t[len(t)-1] == '!'):
                         outcontent.append(re.sub('\n', ' ', t))
         
@@ -34,7 +36,7 @@ def main():
                     f.write(t+"\n")
         
         i += 1
-        #if i == 100:
+        #if i == 10:
         #    break
 
 
