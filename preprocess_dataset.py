@@ -50,8 +50,8 @@ def main():
             tokens = nltk.sent_tokenize(contents, language='slovene')
 
             for t in tokens:
-                # Replace any non-ASCII character except čćšžČĆŠŽ with whitespace
-                t = re.sub(r"[^\x00-\x7FčćšžČĆŠŽ]", ' ', t)  
+                # Replace any non-ASCII character except čćšžđČĆŠŽĐ with whitespace
+                t = re.sub(r"[^\x00-\x7FčćšžđČĆŠŽĐ]", ' ', t)  
                 t = re.sub('\n', ' ', t)
                 t = re.sub('[ ]+', ' ', t)
                 t = t.strip()
