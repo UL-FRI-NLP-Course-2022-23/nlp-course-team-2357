@@ -11,7 +11,7 @@ def main():
         os.mkdir("cckres/translated/sl")
 
     if str(sys.argv[1]) == "ensl":
-        listdir = "cckres/translated/sl"
+        listdir = "cckres/translated/en"
     if str(sys.argv[1]) == "slen":
         listdir = "cckres/preprocessed"
 
