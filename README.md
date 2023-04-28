@@ -237,3 +237,8 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
     INFO:     Application startup complete.
     INFO:     Uvicorn running on http://0.0.0.0:4000 (Press CTRL+C to quit)
     ```
+# Model training
+As our base model we chose [cjvt](https://huggingface.co/cjvt). We have two option. Either large or small t5 model. If you have a GPU with 8GB of RAM, you need to use the small version of the model. It is not documented on the model readme, but in our case the large model needs more than 8GB of RAM for succesfull training. If you want to use the large model you simply need to change model and tokenizer from small to large. In case, you have less than 8GB of GPU memory and the script produces OOM error, you can change the batch_size to a smaller number. You don't need to download anything. The script will automaticly download the model and tokenizer. After the script has finished, the new model will be saved in folder /Paraphrase_generator.
+
+## Testing the new model
+For quick debuging, and testing if the model even generates anything, we provided a simple_test.py script. This script will load the new model and generate a response.
