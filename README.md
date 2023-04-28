@@ -17,6 +17,8 @@ Group public acronym/name: nlp-course-team-2357
 - [Manual setup of Slovene NMT](#manual-setup-of-slovene-nmt)
   - [Prerequisites](#prerequisites)
   - [Setting it up](#setting-it-up)
+- [Model training](#Model training)
+  - [Testing the new model](#Testing the new model)
 
 
 
