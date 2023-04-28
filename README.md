@@ -14,11 +14,13 @@ Group public acronym/name: nlp-course-team-2357
 - [Dataset](#dataset)
 - [Docker](#docker)
 - [Slovene NMT](#slovene-nmt)
+- [Model training](#model-training)
+  - [Testing the new model](#testing-the-new-model)
+- [Future work](#future-work)
+- [Appendix](#appendix)
 - [Manual setup of Slovene NMT](#manual-setup-of-slovene-nmt)
   - [Prerequisites](#prerequisites)
   - [Setting it up](#setting-it-up)
-- [Model training](#Model-training)
-  - [Testing the new model](#Testing-the-new-model)
 
 
 
@@ -30,6 +32,8 @@ The dataset will be extracted inside the folder `cckres`, with the following str
 - `cckres/text` contains files with raw, unprocessed text of the corpus.
 - `cckres/xml` contains the corresponding `xml` files, which split the raw text into paragraphs, sentences, and words. The lemma and [Slovene MSD](http://nl.ijs.si/jos/josMSD-en.html) (Morpho-Syntactic Descriptor) of each word is known.
 - `cckres/vert` contains a single file, `cckres.vert`, a vertical file containing *all* text from the corpus, split into paragraphs, sentences, and words, with lemmas, Slovene and English MSDs known for each word.
+
+The dataset can be preprocessed by simply running the script `preprocess_dataset.py`.
 
 
 # Docker
@@ -70,7 +74,24 @@ Note that the API of the two containers will not be available until the model is
 
 **Important note**: on Windows, the two Docker containers that will be created, coupled with the VM Docker Desktop uses in the background, can in total easily take up 12-13GB of RAM just to be able to run. If you have more than 16GB of RAM, you should be okay, but if you don't, we **strongly** suggest running one container at a time.
 
-Setting up `Slovene_NMT` can also be done "manually". The steps are included at the bottom of this README, in section [Manual setup of Slovene NMT](#manual-setup-of-slovene-nmt), for completeness sake.
+Setting up `Slovene_NMT` can also be done "manually". The steps are included in the Appendix of this README, in section [Manual setup of Slovene NMT](#manual-setup-of-slovene-nmt), for completeness sake.
+
+
+
+# Model training
+
+As our base model, we chose models pretrained on Slovene from [cjvt repository](https://huggingface.co/cjvt). We have two options, either [`t5-sl-small`](https://huggingface.co/cjvt/t5-sl-small) or [`t5-sl-large`](https://huggingface.co/cjvt/t5-sl-large). If you have a GPU with 8GB of RAM, you need to use the small version of the model. It is not documented on the model README, but in our case the large model needs more than 8GB of RAM for successful training. If you want to use the large model you simply need to change model and tokenizer to be from `t5-sl-large` instead of `t5-sl-small`. In case, you have less than 8GB of GPU memory and the script produces OOM error, you can change the `batch_size` to a smaller number. You don't need to download anything. The script `train_model.py` will automatically download the model and tokenizer. After the script has finished, the new model will be saved in folder `Paraphrase_generator`.
+
+
+## Testing the new model
+
+For quick debugging, and testing if the model even generates anything, we provided a `simple_test.py` script. This script will load the new model and generate a response.
+
+
+
+# Future work
+
+Our ideas for the future can be found in the report.
 
 
 
@@ -78,6 +99,8 @@ Setting up `Slovene_NMT` can also be done "manually". The steps are included at 
 ---
 
 
+
+# Appendix
 
 # Manual setup of Slovene NMT
 
@@ -239,8 +262,3 @@ After waiting for the NVIDIA Docker image to be pulled, downloading the two NeMo
     INFO:     Application startup complete.
     INFO:     Uvicorn running on http://0.0.0.0:4000 (Press CTRL+C to quit)
     ```
-# Model training
-As our base model we chose [cjvt](https://huggingface.co/cjvt). We have two option. Either large or small t5 model. If you have a GPU with 8GB of RAM, you need to use the small version of the model. It is not documented on the model readme, but in our case the large model needs more than 8GB of RAM for succesfull training. If you want to use the large model you simply need to change model and tokenizer from small to large. In case, you have less than 8GB of GPU memory and the script produces OOM error, you can change the batch_size to a smaller number. You don't need to download anything. The script will automaticly download the model and tokenizer. After the script has finished, the new model will be saved in folder /Paraphrase_generator.
-
-## Testing the new model
-For quick debuging, and testing if the model even generates anything, we provided a simple_test.py script. This script will load the new model and generate a response.

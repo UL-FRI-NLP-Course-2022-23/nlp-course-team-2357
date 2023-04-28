@@ -2,3 +2,4 @@ nltk
 requests
 transformers
 sentencepiece
+datasets

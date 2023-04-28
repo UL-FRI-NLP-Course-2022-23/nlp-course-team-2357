@@ -16,7 +16,7 @@ def generate(text,model,tokenizer):
    model.eval()
    input_ids = tokenizer.encode(text,return_tensors="pt").to(device)  
    outputs = model.generate(input_ids,max_new_tokens=1000)
-   return tokenizer.decode(outputs[0])
+   return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 def main():
     data = input("Please enter the message:\n")
