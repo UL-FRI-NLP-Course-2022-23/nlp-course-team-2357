@@ -15,9 +15,15 @@ model = model.to(device)
 def generate(text,model,tokenizer):
    model.eval()
    input_ids = tokenizer.encode(text,return_tensors="pt").to(device)  
-   outputs = model.generate(input_ids,max_new_tokens=1000,min_new_tokens=100)
+   outputs = model.generate(input_ids,max_new_tokens=1000)
    return tokenizer.decode(outputs[0])
 
-inp = "Danes je zunaj lep sončen dan. Na nebu ni niti enega oblaka"
+def main():
+    data = input("Please enter the message:\n")
+    while 'exit' != data:
+        print(generate(data,model,tokenizer))
+        data = input("Please enter the message:\n")
 
-print(generate(inp,model,tokenizer))
+
+if __name__ == "__main__":
+    main()
