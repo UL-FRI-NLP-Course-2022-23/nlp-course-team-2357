@@ -2,10 +2,8 @@ def main():
 
     from torch.utils.data import Dataset
     import torch
-    import pandas as pd
     import os
-    from transformers import AutoTokenizer
-    from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+    from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer, AutoTokenizer
     from datasets import Dataset
 
 
