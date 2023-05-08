@@ -6,9 +6,9 @@ then
     exit
 fi
 
-# Download zstd and extract
-curl https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-v1.5.5-win64.zip -L -o zstd.zip
-unzip -q -o zstd.zip -d zstd
+cd ..
+
+sudo apt-get install zstd -y
 
 # Image necessary for Slovene NMT
 docker pull nvcr.io/nvidia/pytorch:22.08-py3
@@ -18,9 +18,9 @@ then
     git clone https://github.com/clarinsi/Slovene_NMT.git
 fi
 
-cp docker-compose.gpu.yml Slovene_NMT/docker-compose.gpu.yml
-cp docker-compose.yml Slovene_NMT/docker-compose.yml
-cp Dockerfile Slovene_NMT/Dockerfile
+cp nmt_files/docker-compose.gpu.yml Slovene_NMT/docker-compose.gpu.yml
+cp nmt_files/docker-compose.yml Slovene_NMT/docker-compose.yml
+cp nmt_files/Dockerfile Slovene_NMT/Dockerfile
 
 cd Slovene_NMT
 mkdir models -p
@@ -38,20 +38,17 @@ fi
 
 # Extract all archives
 echo "Extracting slen_GEN_nemo-1.2.6.tar.zst ..."
-../../zstd/zstd-v1.5.5-win64/zstd.exe -d slen_GEN_nemo-1.2.6.tar.zst -f 
+zstd -d slen_GEN_nemo-1.2.6.tar.zst -f
 echo "Extracting ensl_GEN_nemo-1.2.6.tar.zst ..."
-../../zstd/zstd-v1.5.5-win64/zstd.exe -d ensl_GEN_nemo-1.2.6.tar.zst -f
+zstd -d ensl_GEN_nemo-1.2.6.tar.zst -f
 echo "Extracting slen_GEN_nemo-1.2.6.tar ..."
 tar -xf slen_GEN_nemo-1.2.6.tar
 echo "Extracting ensl_GEN_nemo-1.2.6.tar ..."
 tar -xf ensl_GEN_nemo-1.2.6.tar
 
-# Feel free to uncomment these lines if you want to remove the archives and zstd
+# Feel free to uncomment this line if you want to remove the archives
 # rm *.zst *.tar
-# rm -R ../../zstd
-# rm ../../zstd.zip
 
-# Deploy
 cd ..
 if [ "$1" = "gpu" ];
 then

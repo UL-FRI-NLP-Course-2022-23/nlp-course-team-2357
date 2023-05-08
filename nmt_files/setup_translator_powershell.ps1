@@ -3,6 +3,8 @@ if ($args[0] -ne "gpu" -and $args[0] -ne "cpu"){
     exit
 }
 
+Set-Location ..
+
 # Download zstd and extract
 Invoke-WebRequest -Uri https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-v1.5.5-win64.zip -OutFile zstd.zip
 Expand-Archive zstd.zip -Force
@@ -14,9 +16,9 @@ if (-not (Test-Path "Slovene_NMT")){
     git clone https://github.com/clarinsi/Slovene_NMT.git
 }
 
-Copy-Item -Path docker-compose.gpu.yml -Destination Slovene_NMT/docker-compose.gpu.yml
-Copy-Item -Path docker-compose.yml -Destination Slovene_NMT/docker-compose.yml
-Copy-Item -Path Dockerfile -Destination Slovene_NMT/Dockerfile
+Copy-Item -Path nmt_files/docker-compose.gpu.yml -Destination Slovene_NMT/docker-compose.gpu.yml
+Copy-Item -Path nmt_files/docker-compose.yml -Destination Slovene_NMT/docker-compose.yml
+Copy-Item -Path nmt_files/Dockerfile -Destination Slovene_NMT/Dockerfile
 
 Set-Location Slovene_NMT
 if (-not (Test-Path "models")){

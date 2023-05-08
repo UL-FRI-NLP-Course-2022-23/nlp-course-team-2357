@@ -56,7 +56,7 @@ def download_vert(data_dir):
 
 
 def main():
-    data_dir = "cckres"
+    data_dir = "../cckres"
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
 
