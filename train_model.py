@@ -69,18 +69,19 @@ def main():
     tokenized_datasets = preprocess_function(original,translated)
     tokenized_datasets = Dataset.from_dict(tokenized_datasets)
 
-    batch_size = 16
+    batch_size = 64
     args = Seq2SeqTrainingArguments(
-        f"Paraphrase_generator",
+        f"ccKres_5_epoch",
         #evaluation_strategy = "epoch",
         learning_rate=2e-5,
         per_device_train_batch_size=batch_size,
         #per_device_eval_batch_size=batch_size,
         weight_decay=0.01,
-        save_total_limit=3,
-        num_train_epochs=1,
+        #save_total_limit=3,
+        num_train_epochs=5,
         predict_with_generate=True,
         fp16=False,
+        save_strategy="epoch"
         #push_to_hub=True,
     )
 
@@ -95,7 +96,7 @@ def main():
     )
     if __name__ == '__main__':
         trainer.train()
-        trainer.model.save_pretrained('Paraphrase_generator')
+        trainer.model.save_pretrained('ccKres_5_epoch')
               
 if __name__ == '__main__':
     main()    
