@@ -64,6 +64,8 @@ def generate(text, model, tokenizer, method="greedy"):
         print(f"{i+1}: {tokenizer.decode(output, skip_special_tokens=True)}")
     print("-" * 100)
     print()
+    if method == "greedy":
+        return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 def main():
     inp = "Choose output generation method (greedy, beam, sample, top_k, top_p)\n"

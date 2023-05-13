@@ -3,3 +3,5 @@ requests
 transformers
 sentencepiece
 datasets
+rouge_score
+sacrebleu
