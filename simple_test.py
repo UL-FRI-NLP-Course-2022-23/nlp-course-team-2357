@@ -11,14 +11,14 @@ tokenizer = T5Tokenizer.from_pretrained('cjvt/t5-sl-small')
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 model = model.to(device)
 
-def generate(text, model, tokenizer, method="greedy"):
+def generate(text, model, tokenizer, method="greedy", num_outputs=3):
     """
     Feel free to play around with temperature, top_k and top_p values
     """
     model.eval()
     input_ids = tokenizer.encode(text, return_tensors="pt").to(device)
 
-    num_outputs = 3
+    #num_outputs = 3
     beams = 5
     temperature = 0.7
     top_k = 50
@@ -64,7 +64,7 @@ def generate(text, model, tokenizer, method="greedy"):
         print(f"{i+1}: {tokenizer.decode(output, skip_special_tokens=True)}")
     print("-" * 100)
     print()
-    if method == "greedy":
+    if num_outputs == 1:
         return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 def main():

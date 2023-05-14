@@ -35,7 +35,7 @@ def main():
             contents = f.read()
             lines = contents.split('\n')[:-1]
             for data in lines:
-                predictions.append(generate(data, model, tokenizer, method=method))
+                predictions.append(generate(data, model, tokenizer, method=method, num_outputs=1))
         f = os.path.join(PATH_TO_REFERENCE, filename)
         with open(f, encoding='utf-8') as f:
             contents = f.read()
