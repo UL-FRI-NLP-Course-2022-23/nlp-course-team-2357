@@ -8,17 +8,16 @@ model = T5ForConditionalGeneration.from_pretrained('Paraphrase_generator')
 #model = MT5ForConditionalGeneration.from_pretrained(model_id)
 tokenizer = T5Tokenizer.from_pretrained('cjvt/t5-sl-small')
 
-device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 model = model.to(device)
 
-def generate(text, model, tokenizer, method="greedy", num_outputs=3):
+def generate(text, model, tokenizer, method="greedy", num_outputs=3, evaluating=False):
     """
     Feel free to play around with temperature, top_k and top_p values
     """
     model.eval()
     input_ids = tokenizer.encode(text, return_tensors="pt").to(device)
 
-    #num_outputs = 3
     beams = 5
     temperature = 0.7
     top_k = 50
@@ -60,11 +59,12 @@ def generate(text, model, tokenizer, method="greedy", num_outputs=3):
                                  num_return_sequences=num_outputs,
                                  )
         
-    for i, output in enumerate(outputs):
-        print(f"{i+1}: {tokenizer.decode(output, skip_special_tokens=True)}")
-    print("-" * 100)
-    print()
-    if num_outputs == 1:
+    if not evaluating:
+        for i, output in enumerate(outputs):
+            print(f"{i+1}: {tokenizer.decode(output, skip_special_tokens=True)}")
+        print("-" * 100)
+        print()
+    else:
         return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 def main():
@@ -79,6 +79,7 @@ def main():
     while 'exit' != data:
         generate(data, model, tokenizer, method=method)
         data = input(inp)
+        print("-" * 100)
 
 
 if __name__ == "__main__":

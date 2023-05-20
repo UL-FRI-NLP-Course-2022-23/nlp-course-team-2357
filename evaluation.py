@@ -16,7 +16,7 @@ model = T5ForConditionalGeneration.from_pretrained('Paraphrase_generator')
 #model = MT5ForConditionalGeneration.from_pretrained(model_id)
 tokenizer = T5Tokenizer.from_pretrained('cjvt/t5-sl-small')
 
-device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 model = model.to(device)
 
 rouge = load_metric("rouge")
@@ -35,7 +35,8 @@ def main():
             contents = f.read()
             lines = contents.split('\n')[:-1]
             for data in lines:
-                predictions.append(generate(data, model, tokenizer, method=method, num_outputs=1))
+                predictions.append(generate(data, model, tokenizer, method=method, num_outputs=1, evaluating=True))
+
         f = os.path.join(PATH_TO_REFERENCE, filename)
         with open(f, encoding='utf-8') as f:
             contents = f.read()
