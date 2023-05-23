@@ -21,9 +21,12 @@ Group public acronym/name: nlp-course-team-2357
 
 # Dataset
 
-For this project, our main dataset is [ccKres](https://www.clarin.si/repository/xmlui/handle/11356/1034), but we also trained one model on [ccGigafida](https://www.clarin.si/repository/xmlui/handle/11356/1035). Some basic info and statistics can be found in the report, and you can also read more about ccKres and open Slovene corpora in general on [this link](http://eng.slovenscina.eu/korpusi/proste-zbirke).
+For this project, our main datasets are [ccKres](https://www.clarin.si/repository/xmlui/handle/11356/1034) and [ccGigafida](https://www.clarin.si/repository/xmlui/handle/11356/1035). Some basic info and statistics can be found in the report, and you can also read more about ccKres, ccGigafida, and open Slovene corpora in general on [this link](http://eng.slovenscina.eu/korpusi/proste-zbirke).
 
-TODO The dataset we used to train models for paraphrasing is given in TODO *enter file here*. Of course, we had to obtain it somehow. The source code for downloading, preprocessing, back-translating TODO *and tokenizing* the original ccKres dataset can be found in `dataset_setup` folder.
+The dataset we used to train the models for paraphrasing can be found [on this OneDrive link](https://unilj-my.sharepoint.com/personal/slavkozitnik_fri1_uni-lj_si/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fslavkozitnik%5Ffri1%5Funi%2Dlj%5Fsi%2FDocuments%2FFRI%2FNLP%5FCourse%5F2023%2FProjects%20data%20to%20share&ga=1), in the folder "Sentence paraphrasing (Team 2357)". There, you will find an accompanying README, where we explain how we obtained the dataset for training.
+
+All scripts related to working with the dataset (downloading, preprocessing, back-translation and tokenizing) can be found in the `dataset_setup` folder. However, it is not necessary to run any of them, as we suggest just downloading everything from the OneDrive link above (if need be).
+
 
 
 # Slovene NMT
