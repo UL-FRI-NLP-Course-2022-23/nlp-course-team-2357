@@ -5,4 +5,5 @@ sentencepiece
 datasets
 rouge_score
 sacrebleu
+evaluate
 # torch, torchvision, torchaudio (https://pytorch.org/get-started/locally/)

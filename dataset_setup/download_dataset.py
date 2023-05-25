@@ -4,13 +4,17 @@ import zipfile
 import gzip
 
 
+# Links to download parts of ccKres
 XML = "https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1034/cckresV1_0.zip?sequence=1&isAllowed=y"
 TEXT = "https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1034/cckresV1_0-text.zip?sequence=4&isAllowed=y"
 VERT = "https://www.clarin.si/repository/xmlui/bitstream/handle/11356/1034/cckres.vert.gz?sequence=3&isAllowed=y"
 
 
 def download(data_dir, zip_name, url):
-
+    """
+    Download either the zip containing XML files (XML constant above) or the zip containing
+    the raw text (TEXT constant above). Extract the files from the zips to `data_dir/zip_name`.
+    """
     # Download the zip to a temporary file
     print(f"Downloading to {zip_name}.zip...")
     temp_zip_path = os.path.join(data_dir, f"{zip_name}.zip")
@@ -31,6 +35,9 @@ def download(data_dir, zip_name, url):
 
 
 def download_vert(data_dir):
+    """
+    Download the .vert.gz archive and extract the contents to `data_dir/vert`.
+    """
     # Download the gzip to a temporary file
     file_name = "cckres.vert"
     print(f"Downloading to {file_name}.gz...")

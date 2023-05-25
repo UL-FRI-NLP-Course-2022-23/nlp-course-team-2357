@@ -4,15 +4,17 @@ import sys
 
 
 def main():
-    root_dir = "../cckres/translated"
+    root_dir = "../cckres/translated"  # directory to save results
     if not os.path.exists(root_dir):
         os.mkdir(root_dir)
         os.mkdir(f"{root_dir}/en")
         os.mkdir(f"{root_dir}/sl")
 
     if str(sys.argv[1]) == "ensl":
+        # If we're translating English to Slovene, the English files are inputs
         listdir = f"{root_dir}/en"
     if str(sys.argv[1]) == "slen":
+        # If we're translating Slovene to English, the preprocessed (original) files are inputs
         listdir = "../cckres/preprocessed"
 
     all_files = os.listdir(listdir)
@@ -36,7 +38,7 @@ def main():
         if os.path.isfile(f):
             with open(f, encoding='utf-8') as f:
                 contents = f.read()
-                lines = contents.split('\n')[:-1]  # last element is an empty line
+                lines = contents.split('\n')[:-1]  # get all sentences from the file; last element is an empty line
                 i = 0
                 while i < len(lines):
                     # Split lines in batches not exceeding ~4500 characters, due to Slovene_NMT constraint
@@ -49,6 +51,8 @@ def main():
                         c += 1
                     i += c
                     print(f"\tBatch number {batch_num} ... ", end="", flush=True)
+
+                    # Translate with Slovene_NMT running on localhost
                     if str(sys.argv[1]) == "ensl":
                         r = requests.post("http://localhost:4001/api/translate", json={ "src_language": "en",
                                                                                         "tgt_language": "sl",

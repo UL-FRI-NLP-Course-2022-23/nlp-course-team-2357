@@ -4,12 +4,8 @@ from transformers import (
     T5Tokenizer,
 )
 
-model = T5ForConditionalGeneration.from_pretrained('Paraphrase_generator')
-#model = MT5ForConditionalGeneration.from_pretrained(model_id)
-tokenizer = T5Tokenizer.from_pretrained('cjvt/t5-sl-small')
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model = model.to(device)
 
 def generate(text, model, tokenizer, method="greedy", num_outputs=3, evaluating=False):
     """
@@ -68,6 +64,10 @@ def generate(text, model, tokenizer, method="greedy", num_outputs=3, evaluating=
         return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 def main():
+    model = T5ForConditionalGeneration.from_pretrained('./t5-large-2')
+    tokenizer = T5Tokenizer.from_pretrained('cjvt/t5-sl-large')
+    model = model.to(device)
+
     inp = "Choose output generation method (greedy, beam, sample, top_k, top_p)\n"
     method = input(inp)
     print()

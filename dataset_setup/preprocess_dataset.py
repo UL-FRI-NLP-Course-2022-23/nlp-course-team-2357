@@ -30,8 +30,8 @@ def clean_up(contents: str):
 def main():
     nltk.download('punkt')
 
-    source_dir = "../cckres/text"
-    preprocessed_dir = "../cckres/preprocessed"
+    source_dir = "../cckres/text"  # directory with raw, original text
+    preprocessed_dir = "../cckres/preprocessed"  # directory to store the preprocessed files
     if not os.path.exists(preprocessed_dir):
         os.mkdir(preprocessed_dir)
 
@@ -47,7 +47,7 @@ def main():
         with open(f, encoding='utf-8') as f:
             contents = f.read()
             contents = clean_up(contents)
-            tokens = nltk.sent_tokenize(contents, language='slovene')
+            tokens = nltk.sent_tokenize(contents, language='slovene')  # split into sentences
 
             for t in tokens:
                 # Replace any non-ASCII character except čćšžđČĆŠŽĐ with whitespace

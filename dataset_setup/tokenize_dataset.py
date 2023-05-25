@@ -25,6 +25,7 @@ def main():
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
     
+    # Directory to save results
     tokenized_dir = "../tokenized"
     if not os.path.exists(tokenized_dir):
         os.mkdir(tokenized_dir)
@@ -60,6 +61,7 @@ def main():
         original += preprocessed_lines
         translated += translated_lines
     
+    # Split paraphrase pairs in batches of 500000, tokenize and save
     counter = 1
     constant = 500000
     while True:
