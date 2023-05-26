@@ -65,3 +65,8 @@ If you have (access to) a more powerful machine, to use the large model you simp
 # Testing the model
 
 For testing, we provided a [`simple_test.py`](simple_test.py) script. This script will load a model of your choosing and generate a paraphase, based on input text and sampling method. Currently, the script loads the "t5-large-2" model, available on the aforementioned OneDrive link.
+
+
+# Evaluating the model
+
+For evaluating the model, we provide a [`evaluation.py`](evaluation.py) script. The script runs the code from the [`simple_test.py`](simple_test.py) script and evaluates the results with ROUGE and BLEU methods. Currently, the script loads the "t5-large-2" model. The script runs accross all files in the dataset defined in the `PATH_TO_INPUT` and `PATH_TO_REFERENCE` variables. The default method of generation is "top_k".
